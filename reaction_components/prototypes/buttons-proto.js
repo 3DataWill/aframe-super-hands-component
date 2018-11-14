@@ -2,6 +2,7 @@
 module.exports = (function () {
   function buttonIsValid (evt, buttonList) {
     return buttonList.length === 0 ||
+        evt.detail.overrideButtons ||
         buttonList.indexOf(evt.detail.buttonEvent.type) !== -1
   }
   return {

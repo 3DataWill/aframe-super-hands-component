@@ -70,6 +70,15 @@ AFRAME.registerComponent('grabbable', inherit(base, {
     }
   })(),
   remove: function () {
+    // clear out of super-hands state to avoid blocking future gestures
+    for (let hand of this.grabbers) {
+      if (hand && hand.emit) {
+        hand.emit('sh-alter-state', {
+          state: this.GRAB_EVENT,
+          value: null
+        }, false)
+      }
+    }
     this.el.removeEventListener(this.GRAB_EVENT, this.start)
     this.el.removeEventListener(this.UNGRAB_EVENT, this.end)
     this.physicsRemove()

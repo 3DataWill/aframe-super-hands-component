@@ -15,17 +15,25 @@ AFRAME.registerComponent('draggable', inherit({}, buttonCore, {
     this.el.addEventListener(this.UNDRAG_EVENT, this.dragEndBound)
   },
   remove: function () {
+    if (this.hand && this.hand.emit) {
+      this.hand.emit('sh-alter-state', {
+        state: this.DRAG_EVENT,
+        value: null
+      }, false)
+    }
     this.el.removeEventListener(this.DRAG_EVENT, this.dragStart)
     this.el.removeEventListener(this.UNDRAG_EVENT, this.dragEnd)
   },
   dragStart: function (evt) {
     if (evt.defaultPrevented || !this.startButtonOk(evt)) { return }
     this.el.addState(this.DRAGGED_STATE)
+    this.hand = evt.detail.hand
     if (evt.preventDefault) { evt.preventDefault() }
   },
   dragEnd: function (evt) {
     if (evt.defaultPrevented || !this.endButtonOk(evt)) { return }
     this.el.removeState(this.DRAGGED_STATE)
+    this.hand = null
     if (evt.preventDefault) { evt.preventDefault() }
   }
 }))

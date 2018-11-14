@@ -82,6 +82,7 @@ AFRAME.registerComponent('super-hands', {
     this.DRAGOVER_EVENT = 'dragover-start'
     this.UNDRAGOVER_EVENT = 'dragover-end'
     this.DRAGDROP_EVENT = 'drag-drop'
+    this.STATE_ALTER_EVENT = 'sh-alter-state'
 
     // links to other systems/components
     this.otherSuperHand = null
@@ -106,7 +107,10 @@ AFRAME.registerComponent('super-hands', {
     this.onStretchEndButton = this.onStretchEndButton.bind(this)
     this.onDragDropStartButton = this.onDragDropStartButton.bind(this)
     this.onDragDropEndButton = this.onDragDropEndButton.bind(this)
+    this.stateOnAlter = this.stateOnAlter.bind(this)
     this.system.registerMe(this)
+
+    this.el.addEventListener(this.STATE_ALTER_EVENT, this.stateOnAlter)
   },
 
   /**
@@ -132,6 +136,7 @@ AFRAME.registerComponent('super-hands', {
     this.onGrabEndButton()
     this.onStretchEndButton()
     this.onDragDropEndButton()
+    this.el.removeEventListener(this.STATE_ALTER_EVENT, this.stateOnAlter)
   },
   tick: (function () {
     // closer objects and objects with no distance come later in list
@@ -533,5 +538,24 @@ AFRAME.registerComponent('super-hands', {
       this.hoverEls.push(el)
       this.hoverElsIntersections.push(sect[0])
     }
-  }
+  },
+  // manually alter super hands state (e.g. end a grab)
+  stateOnAlter: function (evt) {
+    if (!evt.detail.value) {
+      this.stateTerminate(evt.detail.state)
+    }
+  },
+  stateTerminate: (function () {
+    const endMethods = {
+      'grab-start': 'onGrabEndButton',
+      'stretch-start': 'onStretchEndButton',
+      'drag-start': 'onDragDropEndButton'
+    }
+    const overrideEvent = { detail: { overrideButtons: true } }
+    return function (gesture) {
+      if (this.state.has(gesture)) {
+        this[endMethods[gesture]](overrideEvent)
+      }
+    }
+  })()
 })

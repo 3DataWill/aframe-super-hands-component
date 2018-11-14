@@ -59,6 +59,15 @@ AFRAME.registerComponent('stretchable', inherit(base, {
     this.updateBodies(time, timeDelta)
   },
   remove: function () {
+    // clear out of super-hands state to avoid blocking future gestures
+    for (let hand of this.stretchers) {
+      if (hand && hand.emit) {
+        hand.emit('sh-alter-state', {
+          state: this.STRETCH_EVENT,
+          value: null
+        }, false)
+      }
+    }
     this.el.removeEventListener(this.STRETCH_EVENT, this.start)
     this.el.removeEventListener(this.UNSTRETCH_EVENT, this.end)
   },
