@@ -20,7 +20,7 @@ AFRAME.registerComponent('clickable', AFRAME.utils.extendDeep({}, buttonCore, {
     for (let hand of this.clickers) {
       if (hand && hand.emit) {
         hand.emit('sh-alter-state', {
-          state: this.GRAB_EVENT,
+          state: this.CLICK_EVENT,
           value: null
         }, false)
       }
