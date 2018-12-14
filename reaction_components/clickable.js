@@ -16,6 +16,15 @@ AFRAME.registerComponent('clickable', AFRAME.utils.extendDeep({}, buttonCore, {
     this.el.addEventListener(this.UNCLICK_EVENT, this.end)
   },
   remove: function () {
+    // clear out of super-hands state to avoid blocking future gestures
+    for (let hand of this.clickers) {
+      if (hand && hand.emit) {
+        hand.emit('sh-alter-state', {
+          state: this.GRAB_EVENT,
+          value: null
+        }, false)
+      }
+    }
     this.el.removeEventListener(this.CLICK_EVENT, this.start)
     this.el.removeEventListener(this.UNCLICK_EVENT, this.end)
   },
